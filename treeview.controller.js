@@ -2,6 +2,7 @@
 
 var app = angular.module("KendoDemos", ["kendo.directives"]);
 
+//Get data from your service and put into your valiable (this will be used while processing data)
 var jsondata = [{
         "id": 1,
         "text": "Furniture",
@@ -51,39 +52,32 @@ var jsondata = [{
 
 app.controller("MyCtrl", function ($scope) {
 
+       //This function will be used to traverse the tree and make changes to make it nested based on ParentId 
        $scope.traverseTree = function (jsondata) {
         var map = {},
             node, roots = [];
         for (var i = 0; i < jsondata.length; i += 1) {
             node = jsondata[i];
+            //We'll add child records to items    
             node.items = [];
+            //Adding flag to check if node has any child    
             node.hasChildren = false;
             map[node.id] = i; // use map to look-up the parents
             if (node.parentId !== null) {
+                //When parent ID is available, push that node into parent's child node, and set hasChildren flag    
                 jsondata[map[node.parentId]].items.push(node);
                 jsondata[map[node.parentId]].hasChildren = true;
             } else {
+                //If there is no parent, push node to root level    
                 roots.push(node);
             }
         }
         $scope.things = roots;
+        //Verify if your tree is properly nested.
         console.log(roots);
     };
 
     $scope.traverseTree(jsondata);
-
-    var dataSource = new kendo.data.HierarchicalDataSource({
-        data: {
-            things
-        },
-        schema: {
-            model: {
-                id: "id",
-                hasChildren: "hasChildren"
-            }
-        },
-        dataTextField: "text"
-    });
 
     $scope.thingsOptions = {
         dataSource: things
